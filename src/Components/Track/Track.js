@@ -2,10 +2,12 @@ import React from "react"
 
 export function Track(props) {
 
+    //passed from **app** / onClick to add tracks to playlist from search result
     const addTrack = () => {
         props.onAdd(props.track)
     }
-
+    
+    //passed from **app** /for event listener onClick to remove tracks from playlist
     const removeTrack = () => {
         props.onRemove(props.track)
     }

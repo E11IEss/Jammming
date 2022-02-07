@@ -10,6 +10,7 @@ html {
 
 h1 {
   padding: .77rem 0;
+  margin: 0px ;
   background-color: #010c3f;
   text-align: center;
   font-family: 'Poppins', sans-serif;
@@ -18,7 +19,7 @@ h1 {
 }
 
 h1 .highlight {
-  color: #6c41ec;
+  color: #b63cee;
 }
 
 h2 {
@@ -31,7 +32,7 @@ h2 {
   padding: 0 17% 10% 17%;
   background-image: url('./background.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: 40%;
   background-repeat: no-repeat;
   font-family: 'Work Sans', sans-serif;
   font-weight: 500;

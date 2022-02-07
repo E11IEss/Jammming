@@ -1,81 +1,90 @@
 //application’s client ID and redirect URI.
+let clientID = ''
+let redirectURI = "http://localhost:3000/";
 
-//to store users access token 
 let accessToken;
 
-//checking condition of the access token and expires time to excute different task
-export let Spotify = {
-    getAccessToken() {
-        //if access token is set, return the value saved of the access token variable
-        if (accessToken) {
-            return accessToken;
-        }
-        //if token are not set,check the THE URL to see if it's already obtained
-        const accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
-        const expiresMatch = window.location.href.match(/expires_in=([^&]*)/);
-        //if it's obtained, set the access token to the value of accessTokenMatch(the value we just retrieve)
-        if (accessTokenMatch && expiresMatch) {
-            accessToken = accessTokenMatch[1];
-            let expires = Number(expiresMatch[1]);
-            //this clear the parameter and let us grab a new access token when it's expired
-            window.setTimeout(() => accessToken = '', expires * 1000);
-            window.history.pushState('Access Token', null, '/');
-            return accessTokenMatch;
-        } else {
-            const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectURI}`
-            window.loaction = accessUrl;
-        }
-
-        
-    },
-
-    SearchBar(searchTerm){
-        const accessToken = Spotify.getAccessToken();
-        return fetch(`https://api.spotify.com/v1/search?type=track&q=${searchTerm}`, 
-        {headers:{ Authorization: `Bearer ${accessToken}`}}
-        ).then(respose => {
-            return respose.json();
-        }).then(jsonRespose => {
-            if (!jsonRespose.tracks){
-                return [];
-            }
-            return jsonRespose.tracks.items.map( ele => ({
-                id: ele.id,
-                name: ele.name,
-                artist: ele.artist,
-                album: ele.album.name,
-                uri: ele.uri 
-            }))
-        })
-    },
-
-    savePlaylist(name, trackUris){
-        if(!name || !trackUris.length){
-            return;
-        }         
-        const accessToken = Spotify.getAccessToken();
-        const headers = {Authorization: `Bearer ${accessToken}}`};
-        let userId;
-
-        return fetch('https://api.spotify.com/v1/me', {headers: headers}
-        ).then(response => response.json()
-        ).then(jsonRespose => {
-            userId = jsonRespose.id;
-            return fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, 
-            {
-                headers: headers,
-                method: 'POST',
-                body: JSON.stringify({name: name})
-            }).then(response => response.json()
-            ).then(jsonRespose => {
-                const playlistId = jsonRespose.id;
-                return fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`, 
-                {
-                    headers: headers,
-                    method: 'POST',
-                    body: JSON.stringify({uris: trackUris})
-                })
-            })
-        })
+export const Spotify = {
+  getAccessToken() {
+    if (accessToken) {
+      return accessToken;
     }
+
+    // check for an access token match - match() return an array with the values found
+    const accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
+    const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
+
+    if (accessTokenMatch && expiresInMatch) {
+      accessToken = accessTokenMatch[1];
+      const expiresIn = Number(expiresInMatch[1]);
+
+      // this clears the parameters, allowing us to grab a new access token when it expires
+      window.setTimeout(() => accessToken = '', expiresIn * 1000);
+      window.history.pushState('Access Token', null, '/');
+      return accessToken;
+    } else {
+      const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectURI}`;
+      window.location = accessUrl;
+    }
+  },
+
+  search(term) {
+    const accessToken = Spotify.getAccessToken();
+    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    ).then(response => response.json()
+    ).then(jsonResponse => {
+      // if nothing comes from SPOTIFY API then return an empty array
+      if (!jsonResponse.tracks) {
+        return [];
+      }
+      return jsonResponse.tracks.items.map(track => ({
+        id: track.id,
+        name: track.name,
+        artist: track.artists[0].name,
+        album: track.album.name,
+        uri: track.uri
+      }));
+    });
+  },
+
+  savePlaylist(name, trackUris) {
+    if (!name || !trackUris.length) {
+      return;
+    }
+    const accessToken = Spotify.getAccessToken();
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    let userId;
+
+    return fetch('https://api.spotify.com/v1/me', { headers: headers })
+      .then(response => response.json())
+      .then(jsonResponse => {
+        userId = jsonResponse.id;
+        return fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+          headers: headers,
+          method: "POST",
+          body: JSON.stringify({ name: name })
+        })
+          .then(response => response.json())
+          .then(jsonResponse => {
+            //Store playlist ID
+            const playlistId = jsonResponse.id;
+
+            return fetch(
+              `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
+              {
+                headers: headers,
+                method: "POST",
+                body: JSON.stringify({ uris: trackUris })
+              }
+            );
+          });
+      });
+  }
 }
+
+

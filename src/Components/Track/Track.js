@@ -3,14 +3,13 @@ import React from "react"
 export function Track(props) {
 
     //passed from **app** / onClick to add tracks to playlist from search result
-    const addTrack = () => {
+    const addTrackToPlaylist = () => {
         props.onAdd(props.track)
     }
-    
+
     //passed from **app** /for event listener onClick to remove tracks from playlist
     const removeTrack = () => {
-        // props.onRemove(props.track)
-        console.log(props)
+        props.onRemove(props.track)
     }
 
     return (
@@ -19,9 +18,11 @@ export function Track(props) {
                 <h3>{props.track.name}</h3>
                 <p>{props.track.artist} | {props.track.album}</p>
             </div>
-            <button className="Track-action" onClick={addTrack}>+{/* <-- + or - will go here --> */}</button>
-            <button className="Track-action" onClick={removeTrack}>-{/* <-- + or - will go here --> */}</button>
-            
+            {/* toggle between + add tracks sign and - remove track sign */}
+            {props.removeToggle ? 
+            <button className="Track-action" onClick={removeTrack}>-</button> 
+            : <button className="Track-action" onClick={addTrackToPlaylist}>+</button>
+            }
         </div>
     )
 }

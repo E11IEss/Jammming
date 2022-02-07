@@ -4,12 +4,12 @@ import './SearchBar.css';
 export function SearchBar(props) {
     const [term, setTerm] = useState('')
 
-    const search = (term) => {
+    const search = () => {
         props.onSearch(term)
     }
 
     const handleTermChange = (event) => {
-        setTerm(event.target.value)
+        setTerm(event.target.value);
     }
 
     return (

@@ -6,6 +6,6 @@ export function SearchResult(props) {
     return (
         <div className="SearchResults">
             <h2>Results</h2>
-            <Tracklist searchResult={props.searchResult} onAdd={props.onAdd} isRemoval={false}/>
+            <Tracklist tracks={props.searchResult} onAdd={props.onAdd} isRemoval={false}/>
         </div>)
 }

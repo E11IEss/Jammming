@@ -3,11 +3,12 @@ import './App.css';
 import { SearchBar } from "../SearchBar/SearchBar"
 import { SearchResult } from "../SearchResult/SearchResult";
 import { Playlist } from "../Playlist/Playlist";
+import { Spotify } from "../../util/Spotify";
 
 export function App() {
 
   //state for searchresult. will be passed to **search result** then **tracklist** then **track** component for mapping individual songs
-  const [searchResult, setSearchResult] = useState([{ name: 'song name', id: 1, album: 'album name', artist: 'artist name' }]);
+  const [searchResult, setSearchResult] = useState([{ name: 'song name', id: 1, album: 'album name', artist: 'artist name' }, { name: 'song name', id: 2, album: 'album name', artist: 'artist name' }]);
 
   //state for playlist. setting the name of the list 
   const [playListName, setPlayListName] = useState('listname');
@@ -33,13 +34,17 @@ export function App() {
 
   //method for saving playlist to account
   const savePlaylist = () => {
-    let trackURIs = playListTracks;
+    let trackURIs = playListTracks.map(ele => ele.uri);
+    Spotify.savePlaylist(setPlayListName, trackURIs).then(() => {
+      setPlayListName('New Playlist');
+      setPlayListTracks([]);
+    })
 
   }
 
   //method that cononect to SpotifyWeb API and let user do searches
   const search = (term) => {
-    console.log(term)
+    Spotify.search(term).then(searchResult => setSearchResult(searchResult))
   }
 
   return (

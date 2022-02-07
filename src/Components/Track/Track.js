@@ -9,7 +9,8 @@ export function Track(props) {
     
     //passed from **app** /for event listener onClick to remove tracks from playlist
     const removeTrack = () => {
-        props.onRemove(props.track)
+        // props.onRemove(props.track)
+        console.log(props)
     }
 
     return (
